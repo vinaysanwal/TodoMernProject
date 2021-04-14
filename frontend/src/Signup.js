@@ -3,37 +3,18 @@ import React, { useState, useEffect } from "react";
 import RegisterInput from "./components/auth/RegisterInput";
 import CourseGoals from "./components/goals/CourseGoals";
 import ErrorAlert from "./components/UI/ErrorAlert";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
 
 function Signup() {
-  const [loadedGoals, setLoadedGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(function () {
-    async function fetchData() {
-      setIsLoading(true);
-
-      try {
-        const response = await fetch("http://localhost/goals");
-
-        const resData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(resData.message || "Fetching the goals failed.");
-        }
-
-        setLoadedGoals(resData.goals);
-      } catch (err) {
-        setError(
-          err.message ||
-            "Fetching goals failed - the server responsed with an error."
-        );
-      }
-      setIsLoading(false);
-    }
-
-    fetchData();
-  }, []);
+  const storedJwt = localStorage.getItem("token");
+  const [jwt, setJwt] = useState(storedJwt || null);
 
   async function loginUserHandler(userName, userEmail, userPassword) {
     setIsLoading(true);
@@ -52,28 +33,19 @@ function Signup() {
       });
 
       const resData = await response.json();
-
-      console.log(resData);
-
-      if (!response.ok) {
-        throw new Error(resData.message || "Adding the goal failed.");
+      if (resData.token) {
+        localStorage.setItem("token", resData.token);
+        setJwt(resData.token);
+        window.location.reload();
       }
 
-      // setLoadedGoals((prevGoals) => {
-      //   const updatedGoals = [
-      //     {
-      //       id: resData.goal.id,
-      //       text: goalText,
-      //       description: goalDescription,
-      //     },
-      //     ...prevGoals,
-      //   ];
-      //   return updatedGoals;
-      // });
+      if (!response.ok) {
+        throw new Error(resData.message || "Registration falied");
+      }
     } catch (err) {
       setError(
         err.message ||
-          "Adding a goal failed - the server responsed with an error."
+          "Registration failed- the server responsed with an error."
       );
     }
     setIsLoading(false);
@@ -81,7 +53,11 @@ function Signup() {
 
   return (
     <div>
-      <RegisterInput onAddGoal={loginUserHandler} />
+      {jwt ? (
+        <Redirect to="/" />
+      ) : (
+        <RegisterInput onAddGoal={loginUserHandler} />
+      )}
     </div>
   );
 }

@@ -8,6 +8,8 @@ function Home() {
   const [loadedGoals, setLoadedGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const storedJwt = localStorage.getItem("token");
+  const [jwt, setJwt] = useState(storedJwt || null);
 
   useEffect(function () {
     async function fetchData() {
@@ -120,41 +122,45 @@ function Home() {
 
       const resData = await response.json();
 
+      if (resData) {
+        window.location.reload();
+      }
+
       if (!response.ok) {
         throw new Error(resData.message || "Updating the goal failed.");
       }
 
-      setLoadedGoals((prevGoals) => {
-        if (
-          resData.goal.text === goalText &&
-          resData.goal.description === goalDescription
-        ) {
-          console.log("Yes loop");
-          return prevGoals;
-        } else if (
-          resData.goal.text !== goalText ||
-          resData.goal.description !== goalDescription
-        ) {
-          console.log("no Loop");
-          const updatedGoals = [
-            {
-              id: resData.goal.id,
-              text: goalText,
-              description: goalDescription,
-            },
-            ...prevGoals,
-          ];
+      // setLoadedGoals((prevGoals) => {
+      //   if (
+      //     resData.goal.text === goalText &&
+      //     resData.goal.description === goalDescription
+      //   ) {
+      //     console.log("Yes loop");
+      //     return prevGoals;
+      //   } else if (
+      //     resData.goal.text !== goalText ||
+      //     resData.goal.description !== goalDescription
+      //   ) {
+      //     console.log("no Loop");
+      //     const updatedGoals = [
+      //       {
+      //         id: resData.goal.id,
+      //         text: goalText,
+      //         description: goalDescription,
+      //       },
+      //       ...prevGoals,
+      //     ];
 
-          const filterUpdatedGoals = updatedGoals.filter(
-            (goal) =>
-              goal.description === goalDescription && goal.text === goalText
-          );
+      //     const filterUpdatedGoals = updatedGoals.filter(
+      //       (goal) =>
+      //         goal.description === goalDescription && goal.text === goalText
+      //     );
 
-          return filterUpdatedGoals;
-        } else {
-          return prevGoals;
-        }
-      });
+      //     return filterUpdatedGoals;
+      //   } else {
+      //     return prevGoals;
+      //   }
+      // });
     } catch (err) {
       setError(
         err.message ||
@@ -164,8 +170,14 @@ function Home() {
     setIsLoading(false);
   }
 
+  function logoutHandler() {
+    localStorage.removeItem("token");
+    window.location.reload();
+  }
+
   return (
     <div>
+      <button onClick={logoutHandler}>Logout</button>
       {error && <ErrorAlert errorText={error} />}
       <GoalInput onAddGoal={addGoalHandler} />
       {!isLoading && (

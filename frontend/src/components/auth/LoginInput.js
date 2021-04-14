@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { Link } from "react-router-dom";
 import "./Input.css";
 import Card from "../UI/Card";
 
@@ -53,6 +53,9 @@ function LoginInput(props) {
           />
           <button>Login</button>
         </form>
+        <Link to="/register">
+          <button>Click Here To Register</button>
+        </Link>
       </Card>
     </section>
   );

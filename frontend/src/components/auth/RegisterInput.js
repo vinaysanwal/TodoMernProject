@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 import "./Input.css";
 import Card from "../UI/Card";
@@ -65,8 +66,11 @@ function LoginInput(props) {
             onChange={updateUserPasswordHandler}
             placeholder="Enter Your Password"
           />
-          <button>Login</button>
+          <button>Register</button>
         </form>
+        <Link to="/login">
+          <button>Click Here To Login</button>
+        </Link>
       </Card>
     </section>
   );
