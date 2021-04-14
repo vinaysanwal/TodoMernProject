@@ -8,7 +8,11 @@ const App = () => {
   return (
     <Router>
       <Fragment>
-        <Route exact path="/" component={Home} />
+        <Switch>
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/" component={Home} />
+          <Route exact path="/register" component={SignUp} />
+        </Switch>
       </Fragment>
     </Router>
   );
